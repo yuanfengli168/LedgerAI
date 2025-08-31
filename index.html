@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Ledger-AI</title>
+</head>
+<body>
+    <header class="header-title">Ledger-AI</header>
+
+    <main class="main-content">
+        <div class="intro">
+            <h2>Welcome to Ledger-AI, your personal finance assistant.</h2>
+            <p>We save at least 30mins for you every month, by uploading or manually typing in your monthly spendings and incomes, </p>
+            <p>We give you summaries with OPEN AI apis, such as ChatGPT and DeepSeek</p>
+        </div>
+        <div class="features">
+            <h2>Features</h2>
+            <p>Adding your incomes or spendings here</p>
+
+            <div class="form">
+                <form action="">
+                    <div class="inputs">
+
+                        <div class="input-item">
+                            <select name="type">
+                                <option value="excel">Upload Excel</option>
+                                <option value="manual">Manual Inputs</option>
+                            </select>
+
+                            <div class="input-variants">
+                                <div class="manual-inputs" style="display: none;">
+                                    <span>Start Date</span>
+                                    <input type="date" name="startDate" placeholder="Date" style="display: inline-block;">
+                                    <span>End Date</span>
+                                    <input type="date" name="endDate" placeholder="Date" style="display: inline-block;">
+
+                                    <p>Description</p>
+                                    <input type="text" name="description" placeholder="Description">
+                                    <input type="number" name="spending" placeholder="Total Spending">
+                                    <input type="number" name="income" placeholder="Total Income">
+
+                                    
+                                </div>
+                                <div class="excel-inputs">
+                                    <input type="text" name="description" placeholder="Description">
+                                    <input type="file" name="excel-file" accept=".xlsx, .xls">
+                                </div>
+                            </div>
+                        </div>                 
+                    </div>
+                    
+
+                    <div class="add-button-div">
+                        <button class="add-button" type="add">Add Inputs</button>
+                    </div>
+                    <button class="submit-button" type="submit">Submit the whole Forms</button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    
+
+    <footer class="footer-content">
+
+    </footer>
+
+    <script src="./listeners.js"></script>
+    <script src="./utils.js"></script>
+</body>
+</html>
