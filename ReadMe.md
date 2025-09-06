@@ -11,7 +11,7 @@
 yuanfeng Li
 Aug 31 2025
 
-- frontend:
+- frontend: (done by using 1 our with Github copilot on Aug31st 2025)
   - One big form
   - default 1 submit input boxes
   - input boxes has 2 selections: 
@@ -22,6 +22,32 @@ Aug 31 2025
       - 1. only supports uploading excel files for now.
   - a submit button, 
     - debating, whether should we have a next confirmation page or not?
+
+
+- Data Pipelines, and microservices: 
+  - using Python:  
+    - because openAI API probably not able to take more than 2 excel files, so we need to turn excel file content into 1 single text file. 
+    - using python on a microservices to do 2 things: 
+      - 1) create JSON file for the contents that we can send to DEEPSEEK, and OPENAI apis
+      - 2) need to create an HTML file, and it is using <td>,<tr>, and a delete button, or recover button.
+  - This microservices must be locally deployed, 
+
+
+- The flow: 
+  - 1) frontend
+  - 2) submit from frontend
+  - 3) go to Data Pipelines, cleasing, and give back HTML to frontend
+  - 4) HTML is like a table, wait to remove, add, recover
+  - 5) final confirm and submit button clicked on frontend
+  - 6) send to Data Pipelines again, to create one piece of information for OPEN AI APIs
+  - 7) waiting for APIs reply for total cost, total spendings in (local currency)
+
+
+MVP2.0: 
+- can add encryption for all data transferring to data pipelines
+- can add encryption for all data transferring to OPEN AI APIs
+- can add a real-time currency exchange view.
+
 
 
 - backend: 
