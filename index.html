@@ -22,6 +22,12 @@
             <div class="form">
                 <form action="">
                     <div class="inputs">
+                        <div class="date-range">
+                            <span>Start Date</span>
+                            <input type="date" name="startDate" placeholder="Date" style="display: inline-block; margin-right: 20px;">
+                            <span>End Date</span>
+                            <input type="date" name="endDate" placeholder="Date" style="display: inline-block;">
+                        </div>
 
                         <div class="input-item">
                             <select name="type">
@@ -31,21 +37,36 @@
 
                             <div class="input-variants">
                                 <div class="manual-inputs" style="display: none;">
-                                    <span>Start Date</span>
-                                    <input type="date" name="startDate" placeholder="Date" style="display: inline-block;">
-                                    <span>End Date</span>
-                                    <input type="date" name="endDate" placeholder="Date" style="display: inline-block;">
-
                                     <p>Description</p>
                                     <input type="text" name="description" placeholder="Description">
                                     <input type="number" name="spending" placeholder="Total Spending">
+                                    <select name="spending-currency">
+                                        <option value="sgd">SGD</option>
+                                        <option value="usd">USD</option>
+                                        <option value="rmb">RMB</option>
+                                    </select>
                                     <input type="number" name="income" placeholder="Total Income">
+                                    <select name="income-currency">
+                                        <option value="sgd">SGD</option>
+                                        <option value="usd">USD</option>
+                                        <option value="rmb">RMB</option>
+                                    </select>
 
-                                    
+                                    <!-- add an check box indicating that spending and income currecies are not synced -->
+                                    <label>
+                                        <input type="checkbox" name="currency-sync" checked>
+                                        Keep Spending and Income Currencies in Sync
+                                    </label>
                                 </div>
                                 <div class="excel-inputs">
                                     <input type="text" name="description" placeholder="Description">
-                                    <input type="file" name="excel-file" accept=".xlsx, .xls">
+                                    <input type="file" name="excel-file" accept=".xlsx, .xls, .csv">
+                                    <span>Currency:</span>
+                                    <select name="file-currency">    
+                                        <option value="sgd">SGD</option>
+                                        <option value="usd">USD</option>
+                                        <option value="rmb">RMB</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>                 
@@ -68,6 +89,8 @@
     </footer>
 
     <script src="./listeners.js"></script>
+    <script src="./api.js"></script>
     <script src="./utils.js"></script>
+    
 </body>
 </html>

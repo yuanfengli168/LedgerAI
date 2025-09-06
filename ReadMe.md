@@ -22,6 +22,7 @@ Aug 31 2025
       - 1. only supports uploading excel files for now.
   - a submit button, 
     - debating, whether should we have a next confirmation page or not?
+  - Data Pipelines from Frontend is Done. (2 hours Sep062025), next steps is to build microservices of python, and deploy locally, then use HTTPS, and CryptoJS to encrypt all the sending files, and all the contents in the files since they are personal financial informations.
 
 
 - Data Pipelines, and microservices: 
@@ -69,3 +70,42 @@ MVP2.0:
 MVP2.0 Visions: 
   - 3) after MVP1.0, we add more features. 
   - 4) It is open sources, so we can let everyone to get another api of the users input, and they can substitute the api with theirs
+
+
+
+## TODOS:
+### TODOS、From09062025
+Data Pipelines from Frontend is Done today. (2 hours Sep062025), next steps is to build microservices of python, and deploy locally, then use HTTPS, and CryptoJS to encrypt all the sending files, and all the contents in the files since they are personal financial informations.
+
+1. 前端集成 CryptoJS 加密：
+   - 选择合适的加密算法（如 AES）。
+   - 在 api.js 的 analyze/convert 方法中，对所有文本字段加密。
+   - 文件加密方案调研（如用 FileReader + CryptoJS）。
+   - 前端加密密钥管理方案设计。
+
+2. 后端解密支持：
+   - Python 后端集成 CryptoJS 对应算法（如 pycryptodome）。
+   - 解密前端加密的内容，确保与前端密钥一致。
+   - 测试端到端加密/解密流程。
+
+3. HTTPS 部署：
+   - 本地开发环境配置自签名证书。
+   - 线上服务器申请并配置正规 SSL/TLS 证书（如 Let’s Encrypt）。
+   - 强制所有接口只接受 HTTPS 请求。
+   - 检查浏览器和服务器 HTTPS 配置是否生效。
+
+4. 安全性测试与合规：
+   - 检查前后端传输和存储环节是否有明文泄露风险。
+   - 增加接口鉴权（如 JWT、API Key）。
+   - 定期安全审计和漏洞扫描。
+
+5. 文档与用户指引：
+   - 在 ReadMe.md 中补充加密和 HTTPS 配置说明。
+   - 编写加密/解密使用示例。
+   - 用户隐私和数据安全声明。
+
+预期这个用两周做出来。
+Analyze 这个要四周，以为还要和GPT， Deepseek 绑定。
+
+## Plans/Predictions: 
+- 我觉得大概要做到11/15 号前，我们这个网站可以在local 跑起来，就很不错了。

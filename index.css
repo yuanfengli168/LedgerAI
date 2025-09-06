@@ -34,9 +34,9 @@ body {
     margin-bottom: 15px;
     border: 1px solid #8c8c8c;
     border-radius: 5px;
-    padding: 32px;
-    height: 100px;
-
+    padding: 24px;
+    height: 120px;
+    position: relative;
 }
 
 .add-button-div {
@@ -61,4 +61,13 @@ body {
     position: relative;
     bottom: 0;
     width: 100%;
+}
+
+.remove-button-div {
+    position: absolute;
+    bottom: 10px;
+}
+
+.date-range {
+    margin-bottom: 10px;
 }
