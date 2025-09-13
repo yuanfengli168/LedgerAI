@@ -8,4 +8,9 @@ var dom = {
     button: document.querySelector('button[type="submit"]'),
     inputs: document.querySelector('.inputs'),
     removeButtons: document.querySelectorAll('.remove-button'),
+    modalRemoveButton: document.querySelector('.modal .close-button'),
+    modal: document.querySelector('.modal'),
+    modalContent: document.querySelector('.modal .modal-content'),
+    summaryDetails: document.querySelector('.summary-details'),
+    modalSpinner: document.querySelector('.modal .spinner'),
 };

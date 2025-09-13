@@ -23,10 +23,10 @@
                 <form action="">
                     <div class="inputs">
                         <div class="date-range">
-                            <span>Start Date</span>
-                            <input type="date" name="startDate" placeholder="Date" style="display: inline-block; margin-right: 20px;">
-                            <span>End Date</span>
-                            <input type="date" name="endDate" placeholder="Date" style="display: inline-block;">
+                            <span>Start Date (default 1st day of current Month)</span>
+                            <input type="date" name="startDate" placeholder="Date" style="display: inline-block; margin-right: 20px;" id="startDate">
+                            <span>End Date (default last day of current Month)</span>
+                            <input type="date" name="endDate" placeholder="Date" style="display: inline-block;" id="endDate">
                         </div>
 
                         <div class="input-item">
@@ -88,7 +88,36 @@
 
     </footer>
 
+    <div class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="summary-details">
+                <!-- Summary details will be populated here -->
+                <!-- show a spinning loader while processing -->
+                <div class="spinner shown"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="./listeners.js"></script>
+    <script>
+    // 自动设置本月第一天和最后一天为默认值
+    window.addEventListener('DOMContentLoaded', function() {
+        var startDateInput = document.getElementById('startDate');
+        var endDateInput = document.getElementById('endDate');
+        var now = new Date();
+        var firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        var lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        function formatDateLocal(date) {
+            let yyyy = date.getFullYear();
+            let mm = String(date.getMonth() + 1).padStart(2, '0');
+            let dd = String(date.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        startDateInput.value = formatDateLocal(firstDay);
+        endDateInput.value = formatDateLocal(lastDay);
+    });
+    </script>
     <script src="./api.js"></script>
     <script src="./utils.js"></script>
     

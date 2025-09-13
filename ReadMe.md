@@ -109,3 +109,29 @@ Analyze 这个要四周，以为还要和GPT， Deepseek 绑定。
 
 ## Plans/Predictions: 
 - 我觉得大概要做到11/15 号前，我们这个网站可以在local 跑起来，就很不错了。
+
+
+
+# Learnings：
+- local date time for current month:
+
+  ## 前端日期默认值与时区问题
+  - 之前用 `toISOString().slice(0, 10)` 设置 `<input type="date">` 默认值，结果部分用户看到的日期不是本地时间（如显示为8月30日），原因是 `toISOString()` 返回的是 UTC 时间。
+  - 解决方法：用本地时间格式，避免时区影响。
+
+  ### 推荐代码
+  ```js
+  function formatDateLocal(date) {
+      let yyyy = date.getFullYear();
+      let mm = String(date.getMonth() + 1).padStart(2, '0');
+      let dd = String(date.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+  }
+  startDateInput.value = formatDateLocal(firstDay);
+  endDateInput.value = formatDateLocal(lastDay);
+  ```
+  - 这样设置 `<input type="date">` 的 value 就是本地时间，用户体验一致。
+
+  ### 总结
+  - 日期输入框建议用本地格式，避免 UTC/时区导致的日期偏移。
+  - 适用于所有需要本地日期的场景。

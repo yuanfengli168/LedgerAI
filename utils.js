@@ -152,8 +152,11 @@ form.addEventListener('submit', function (event) {
         return;
     }
 
-    // Prepare FormData to send to backend  
+    // Show the modal
+    dom.modal.classList.remove('hidden');
+    dom.modal.classList.add('shown');
 
+    // Prepare FormData to send to backend  
     var formData = new FormData();
 
     var inputItems = inputs.querySelectorAll('.input-item');
@@ -196,13 +199,65 @@ form.addEventListener('submit', function (event) {
         console.log(pair[0] + ': ' + pair[1]);
     }
     
-    // // using method from api.js to send formData to backend and receive converted JSON
-    // convert(formData).then(result => {
-    //     console.log('Conversion Result:', result);
-    // }).catch(error => {
-    //     console.error('Error during conversion:', error);
-    // });
+    // using method from api.js to send formData to backend and receive converted JSON
+    convert(formData).then(result => {
+        console.log(result.status);
+
+        console.log('Conversion Result:', result);
+        // hide the spinner
+        dom.modalSpinner.classList.add('hidden');
+        dom.modalSpinner.classList.remove('shown');
+        // display the success message in the modal content, similar style as error but with green check icon
+        dom.summaryDetails.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: green; font-size: 16px;">&#10003;</span>
+                </div>
+                <h2>Data Received & Processed!</h2>
+            </div>
+        `;
+
+    }).catch(error => {
+        console.error('Error during conversion:', error);
+        // hide the spinner
+        dom.modalSpinner.classList.add('hidden');
+        dom.modalSpinner.classList.remove('shown');
+        // display the error in the modal content, similar style as success but with red cross icon
+        dom.summaryDetails.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: red; font-size: 16px;">&#10005;</span>
+                </div>
+                <h2>Error</h2>
+            </div>
+            <p>${error.message}! Please try again later.</p>
+        `;
+    });
 });// api.js - 前端与后端交互的基础封装
+
+// add event listener to close the modal when clicking the close button
+dom.modalRemoveButton.addEventListener('click', function () {
+    dom.modal.classList.remove('shown');
+    dom.modal.classList.add('hidden');
+    // reset the modal content to initial state
+    dom.summaryDetails.innerHTML = "";
+    // put the <div class="spinner"></div> to shown
+    dom.modalSpinner.classList.remove('hidden');
+    dom.modalSpinner.classList.add('shown');
+});
+
+// add event listener to close the modal when clicking outside the modal content
+dom.modal.addEventListener('click', function (event) {
+    if (event.target === dom.modal) {
+        dom.modal.classList.remove('shown');
+        dom.modal.classList.add('hidden');
+        // reset the modal content to initial state
+        dom.summaryDetails.innerHTML = "";
+        // put the <div class="spinner"></div> to shown
+        dom.modalSpinner.classList.remove('hidden');
+        dom.modalSpinner.classList.add('shown');
+    }
+})
 
 
 // add an event listener to keep the spending currency and income currency in the same input-item in sync
