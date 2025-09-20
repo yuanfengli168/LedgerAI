@@ -1,3 +1,159 @@
+// 渲染 review-table 区域
+function renderReviewTable(result) {
+    var reviewTableDiv = document.querySelector('.review-table');
+    if (!reviewTableDiv) return;
+    reviewTableDiv.innerHTML = '';
+
+    // 顶部 h2
+    var h2 = document.createElement('h2');
+    h2.textContent = 'Review - tables';
+    reviewTableDiv.appendChild(h2);
+
+    // 1. Excels 区域
+    if (result.files && result.files.length > 0) {
+        var excelsH3 = document.createElement('h3');
+        excelsH3.textContent = 'Excels';
+        reviewTableDiv.appendChild(excelsH3);
+        result.files.forEach(function(file, idx) {
+            if (file.table && file.table.length > 0) {
+                var section = document.createElement('div');
+                section.className = 'review-section';
+                // 用 file_descriptions[i] 作为 h4
+                var desc = (result.file_descriptions && result.file_descriptions[idx]) ? result.file_descriptions[idx] : `Excel ${idx+1}`;
+                section.innerHTML = `<h4>${desc}</h4>`;
+                section.appendChild(createReviewTable(file.header, file.table, 'excel', idx));
+                reviewTableDiv.appendChild(section);
+                // 分隔
+                var divider = document.createElement('div');
+                divider.className = 'section-divider';
+                reviewTableDiv.appendChild(divider);
+            }
+        });
+    }
+    // 2. Manual Inputs 区域
+    if (result.manual_entries && result.manual_entries.length > 0) {
+        var manualH3 = document.createElement('h3');
+        manualH3.textContent = 'Manual Inputs';
+        reviewTableDiv.appendChild(manualH3);
+        result.manual_entries.forEach(function(entry, idx) {
+            // 解析 entry 字符串
+            var match = entry.match(/^Manual Entry (\d+):[\r\n]+Description: (.*)[\r\n]+Total Spending: ([^\s]*) ?(\w+)?[\r\n]+Total Income: ([^\s]*) ?(\w+)?/);
+            var entryNum = idx + 1;
+            var desc = '', spending = '', income = '';
+            if (match) {
+                desc = match[2] || '';
+                spending = match[3] || '0';
+                income = match[5] || '0';
+            } else {
+                var lines = entry.split(/\r?\n/);
+                desc = (lines[1] || '').replace('Description:','').trim();
+                spending = (lines[2] || '').replace('Total Spending:','').trim().split(' ')[0] || '0';
+                income = (lines[3] || '').replace('Total Income:','').trim().split(' ')[0] || '0';
+            }
+            var section = document.createElement('div');
+            section.className = 'review-section';
+            section.innerHTML = `<h4>Manual Entry ${entryNum}</h4>`;
+            // 构造表格
+            var table = document.createElement('table');
+            var thead = document.createElement('thead');
+            var trh = document.createElement('tr');
+            ['Description','Total Spending','Total Income','Actions'].forEach(function(h){
+                var th = document.createElement('th'); th.textContent = h; trh.appendChild(th);
+            });
+            thead.appendChild(trh); table.appendChild(thead);
+            var tbody = document.createElement('tbody');
+            var tr = document.createElement('tr');
+            [desc, spending, income].forEach(function(val){
+                var td = document.createElement('td');
+                var input = document.createElement('input');
+                input.value = val;
+                td.appendChild(input);
+                tr.appendChild(td);
+            });
+            // Actions 按钮
+            var tdAction = document.createElement('td');
+            var btn = document.createElement('button');
+            btn.className = 'action-btn delete-btn';
+            btn.textContent = '删除';
+            var deleted = false;
+            btn.addEventListener('click', function() {
+                deleted = !deleted;
+                if (deleted) {
+                    tr.classList.add('deleted');
+                    btn.className = 'action-btn restore-btn';
+                    btn.textContent = '恢复';
+                    Array.from(tr.querySelectorAll('input')).forEach(i => i.disabled = true);
+                } else {
+                    tr.classList.remove('deleted');
+                    btn.className = 'action-btn delete-btn';
+                    btn.textContent = '删除';
+                    Array.from(tr.querySelectorAll('input')).forEach(i => i.disabled = false);
+                }
+            });
+            tdAction.appendChild(btn);
+            tr.appendChild(tdAction);
+            tbody.appendChild(tr); table.appendChild(tbody);
+            section.appendChild(table);
+            reviewTableDiv.appendChild(section);
+        });
+    }
+}
+
+// 创建可编辑表格
+function createReviewTable(header, tableData, type, sectionIdx) {
+    var table = document.createElement('table');
+    var thead = document.createElement('thead');
+    var tr = document.createElement('tr');
+    header.forEach(function(h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        tr.appendChild(th);
+    });
+    tr.appendChild(document.createElement('th')).textContent = 'Actions';
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    tableData.forEach(function(row, rowIdx) {
+        var tr = document.createElement('tr');
+        header.forEach(function(h) {
+            var td = document.createElement('td');
+            var input = document.createElement('input');
+            input.value = row[h] == null ? '' : row[h];
+            input.disabled = !!row._deleted;
+            input.addEventListener('input', function() {
+                row[h] = input.value;
+            });
+            td.appendChild(input);
+            tr.appendChild(td);
+        });
+        // Actions
+        var tdAction = document.createElement('td');
+        var btn = document.createElement('button');
+        btn.className = 'action-btn ' + (row._deleted ? 'restore-btn' : 'delete-btn');
+        btn.textContent = row._deleted ? '恢复' : '删除';
+        btn.addEventListener('click', function() {
+            row._deleted = !row._deleted;
+            if (row._deleted) {
+                tr.classList.add('deleted');
+                btn.className = 'action-btn restore-btn';
+                btn.textContent = '恢复';
+                Array.from(tr.querySelectorAll('input')).forEach(i => i.disabled = true);
+            } else {
+                tr.classList.remove('deleted');
+                btn.className = 'action-btn delete-btn';
+                btn.textContent = '删除';
+                Array.from(tr.querySelectorAll('input')).forEach(i => i.disabled = false);
+            }
+        });
+        tdAction.appendChild(btn);
+        tr.appendChild(tdAction);
+        if (row._deleted) tr.classList.add('deleted');
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    return table;
+}
 // utils controls all listeners from listeners.js
 var addInputButtonDiv = document.querySelector('.add-button-div');
 var addInputButton = dom.addInput;
@@ -162,21 +318,18 @@ function validateInputs() {
 }   
 
 
+
 // Form submission handler
 form.addEventListener('submit', function (event) {
     event.preventDefault();
-    // call a checker function to validate all inputs
     if (!validateInputs()) {
         return;
     }
 
-    // Show the modal
     dom.modal.classList.remove('hidden');
     dom.modal.classList.add('shown');
 
-    // Prepare FormData to send to backend  
     var formData = new FormData();
-
     var inputItems = inputs.querySelectorAll('.input-item');
     inputItems.forEach(function (item, index) {
         var type = item.querySelector('select[name="type"]').value;
@@ -211,21 +364,16 @@ form.addEventListener('submit', function (event) {
 
     // Now formData contains all files and texts, ready to be sent to backend
     console.log('Form Data Prepared for Submission:');
-
-    // For demonstration, log the FormData entries
     for (var pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
     }
-    
+
     // using method from api.js to send formData to backend and receive converted JSON
     convert(formData).then(result => {
         console.log(result.status);
-
         console.log('Conversion Result:', result);
-        // hide the spinner
         dom.modalSpinner.classList.add('hidden');
         dom.modalSpinner.classList.remove('shown');
-        // display the success message in the modal content, similar style as error but with green check icon
         dom.summaryDetails.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -234,13 +382,18 @@ form.addEventListener('submit', function (event) {
                 <h2>Data Received & Processed!</h2>
             </div>
         `;
-
+        // features 区域加 collapsed
+        var featuresDiv = document.querySelector('.features');
+        if (featuresDiv) {
+            featuresDiv.classList.remove('expanded');
+            featuresDiv.classList.add('collapsed');
+        }
+        // 渲染 review-table 区域
+        renderReviewTable(result);
     }).catch(error => {
         console.error('Error during conversion:', error);
-        // hide the spinner
         dom.modalSpinner.classList.add('hidden');
         dom.modalSpinner.classList.remove('shown');
-        // display the error in the modal content, similar style as success but with red cross icon
         dom.summaryDetails.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -251,7 +404,24 @@ form.addEventListener('submit', function (event) {
             <p>${error.message}! Please try again later.</p>
         `;
     });
-});// api.js - 前端与后端交互的基础封装
+});
+
+// features 区域点击切换 collapsed/expanded
+var featuresDiv = document.querySelector('.features');
+if (featuresDiv) {
+    featuresDiv.addEventListener('click', function (event) {
+        // 避免点击表单等子元素时也触发（只允许点击 features 区域空白或标题时切换）
+        if (event.target === featuresDiv || event.target.classList.contains('display-section')) {
+            if (featuresDiv.classList.contains('collapsed')) {
+                featuresDiv.classList.remove('collapsed');
+                featuresDiv.classList.add('expanded');
+            } else if (featuresDiv.classList.contains('expanded')) {
+                featuresDiv.classList.remove('expanded');
+                featuresDiv.classList.add('collapsed');
+            }
+        }
+    });
+}
 
 // add event listener to close the modal when clicking the close button
 dom.modalRemoveButton.addEventListener('click', function () {

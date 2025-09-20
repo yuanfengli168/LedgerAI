@@ -15,74 +15,73 @@
             <p>We save at least 30mins for you every month, by uploading or manually typing in your monthly spendings and incomes, </p>
             <p>We give you summaries with OPEN AI apis, such as ChatGPT and DeepSeek</p>
         </div>
-        <div class="features collapsed" id="features">
-            <div class="display-section">
-                <h2>Features</h2>
-                <p>Adding your incomes or spendings here</p>
+        <div class="features">
+            <h2>Features</h2>
+            <p>Adding your incomes or spendings here</p>
 
-                <div class="form">
-                    <form action="">
-                        <div class="inputs">
-                            <div class="date-range">
-                                <span>Start Date (default 1st day of current Month)</span>
-                                <input type="date" name="startDate" placeholder="Date" style="display: inline-block; margin-right: 20px;" id="startDate">
-                                <span>End Date (default last day of current Month)</span>
-                                <input type="date" name="endDate" placeholder="Date" style="display: inline-block;" id="endDate">
-                            </div>
+            <div class="form">
+                <form action="">
+                    <div class="inputs">
+                        <div class="date-range">
+                            <span>Start Date (default 1st day of current Month)</span>
+                            <input type="date" name="startDate" placeholder="Date" id="startDate" style="display: inline-block; margin-right: 20px;">
+                            <span>End Date (default last day of current Month)</span>
+                            <input type="date" name="endDate" placeholder="Date" id="endDate" style="display: inline-block;">
+                        </div>
 
-                            <div class="input-item">
-                                <select name="type">
-                                    <option value="excel">Upload Excel</option>
-                                    <option value="manual">Manual Inputs</option>
-                                </select>
+                        <div class="input-item">
+                            <select name="type">
+                                <option value="excel">Upload Excel</option>
+                                <option value="manual">Manual Inputs</option>
+                            </select>
 
-                                <div class="input-variants">
-                                    <div class="manual-inputs" style="display: none;">
-                                        <p>Description</p>
-                                        <input type="text" name="description" placeholder="Description">
-                                        <input type="number" name="spending" placeholder="Total Spending">
-                                        <select name="spending-currency">
-                                            <option value="sgd">SGD</option>
-                                            <option value="usd">USD</option>
-                                            <option value="rmb">RMB</option>
-                                        </select>
-                                        <input type="number" name="income" placeholder="Total Income">
-                                        <select name="income-currency">
-                                            <option value="sgd">SGD</option>
-                                            <option value="usd">USD</option>
-                                            <option value="rmb">RMB</option>
-                                        </select>
+                            <div class="input-variants">
+                                <div class="manual-inputs" style="display: none;">
+                                    <p>Description</p>
+                                    <input type="text" name="description" placeholder="Description">
+                                    <input type="number" name="spending" placeholder="Total Spending">
+                                    <select name="spending-currency">
+                                        <option value="sgd">SGD</option>
+                                        <option value="usd">USD</option>
+                                        <option value="rmb">RMB</option>
+                                    </select>
+                                    <input type="number" name="income" placeholder="Total Income">
+                                    <select name="income-currency">
+                                        <option value="sgd">SGD</option>
+                                        <option value="usd">USD</option>
+                                        <option value="rmb">RMB</option>
+                                    </select>
 
-                                        <!-- add an check box indicating that spending and income currecies are not synced -->
-                                        <label>
-                                            <input type="checkbox" name="currency-sync" checked>
-                                            Keep Spending and Income Currencies in Sync
-                                        </label>
-                                    </div>
-                                    <div class="excel-inputs">
-                                        <input type="text" name="description" placeholder="Description">
-                                        <input type="file" name="excel-file" accept=".xlsx, .xls, .csv">
-                                        <span>Currency:</span>
-                                        <select name="file-currency">    
-                                            <option value="sgd">SGD</option>
-                                            <option value="usd">USD</option>
-                                            <option value="rmb">RMB</option>
-                                        </select>
-                                    </div>
+                                    <!-- add an check box indicating that spending and income currecies are not synced -->
+                                    <label>
+                                        <input type="checkbox" name="currency-sync" checked>
+                                        Keep Spending and Income Currencies in Sync
+                                    </label>
                                 </div>
-                            </div>                 
-                        </div>
-                        
+                                <div class="excel-inputs">
+                                    <input type="text" name="description" placeholder="Description">
+                                    <input type="file" name="excel-file" accept=".xlsx, .xls, .csv">
+                                    <span>Currency:</span>
+                                    <select name="file-currency">    
+                                        <option value="sgd">SGD</option>
+                                        <option value="usd">USD</option>
+                                        <option value="rmb">RMB</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>                 
+                    </div>
+                    
 
-                        <div class="add-button-div">
-                            <button class="add-button" type="add">Add Inputs</button>
-                        </div>
-                        <button class="submit-button" type="submit">Submit the whole Forms</button>
-                    </form>
-                </div>
+                    <div class="add-button-div">
+                        <button class="add-button" type="add">Add Inputs</button>
+                    </div>
+                    <button class="submit-button" type="submit">Submit the whole Forms</button>
+                </form>
             </div>
-            
         </div>
+
+        <div class="review-table"></div>
 
     </main>
     

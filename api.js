@@ -19,12 +19,6 @@ async function analyze(formData) {
  * @returns {Promise<Object>} 后端返回的 JSON
  */
 async function convert(formData) {
-    // console print formData content for debugging
-    console.log('FormData entries:');
-    for (let pair of formData.entries()) {
-        console.log(`Key: ${pair[0]}, Value: ${pair[1]}`);
-    }
-
     const response = await fetch('http://127.0.0.1:8000/convert', {
         method: 'POST',
         body: formData,

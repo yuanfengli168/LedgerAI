@@ -74,6 +74,12 @@ MVP2.0 Visions:
 
 
 ## TODOS:
+### from 09212025: 
+1. review table currency, description 需要可以改动
+2. date 需要可以升序或者降序（其他的以后再说）
+3. 也需要可以收缩像Features
+
+
 ### TODOS、From09062025
 Data Pipelines from Frontend is Done today. (2 hours Sep062025), next steps is to build microservices of python, and deploy locally, then use HTTPS, and CryptoJS to encrypt all the sending files, and all the contents in the files since they are personal financial informations.
 
@@ -156,3 +162,10 @@ git push origin main --force
 
 git fetch origingit reset --hard origin/main# 然后用你本地的文件覆盖，再提交并推送
 但最直接的就是 git push --force，只保留本地。
+
+
+
+
+# IMPORTANTS LEARNINGS:
+1. Never ask Github Copilot to rollback by typing, please either use their discard button (not working sometimes, so I would not recomment), be very cautious, It might delete everything you Wrote;
+2. If one functionality is working, please `git add`, then `git commit` because No.1 might happen and Due to AI added thousands lines of code, you as a Human are easy to loss track of what have done or not.
