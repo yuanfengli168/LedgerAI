@@ -5,6 +5,24 @@ var form = dom.form;
 var inputs = dom.inputs;
 var removeButtons = dom.removeButtons;
 
+// 自动设置本月第一天和最后一天为默认值
+window.addEventListener('DOMContentLoaded', function() {
+    var startDateInput = document.getElementById('startDate');
+    var endDateInput = document.getElementById('endDate');
+    var now = new Date();
+    var firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    var lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    function formatDateLocal(date) {
+        let yyyy = date.getFullYear();
+        let mm = String(date.getMonth() + 1).padStart(2, '0');
+        let dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    startDateInput.value = formatDateLocal(firstDay);
+    endDateInput.value = formatDateLocal(lastDay);
+});
+
+
 addInputButton.addEventListener('click', function (event) {
     event.preventDefault();
     var newInputItem = document.createElement('div');
