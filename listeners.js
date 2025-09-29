@@ -13,4 +13,5 @@ var dom = {
     modalContent: document.querySelector('.modal .modal-content'),
     summaryDetails: document.querySelector('.summary-details'),
     modalSpinner: document.querySelector('.modal .spinner'),
+    reviewTable: document.querySelector('.review-table'),
 };

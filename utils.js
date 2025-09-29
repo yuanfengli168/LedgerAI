@@ -37,7 +37,7 @@ function renderReviewTable(result) {
         manualH3.textContent = 'Manual Inputs';
         reviewTableDiv.appendChild(manualH3);
         result.manual_entries.forEach(function(entry, idx) {
-            // 解析 entry 字符串，提取币种
+            // ...existing code for manual entry table rendering...
             var match = entry.match(/^Manual Entry (\d+):[\r\n]+Description: (.*)[\r\n]+Total Spending: ([^\s]*) ?(\w+)?[\r\n]+Total Income: ([^\s]*) ?(\w+)?/);
             var entryNum = idx + 1;
             var desc = '', spending = '', spendingCurrency = 'sgd', income = '', incomeCurrency = 'sgd';
@@ -137,7 +137,188 @@ function renderReviewTable(result) {
             reviewTableDiv.appendChild(section);
         });
     }
+
+    // Render confirm-submit button at the end of reviewTableDiv
+    var existingConfirmDiv = reviewTableDiv.querySelector('.confirm-submit-div');
+    if (existingConfirmDiv) {
+        existingConfirmDiv.style.display = 'block';
+        reviewTableDiv.appendChild(existingConfirmDiv);
+    } else {
+        var confirmDiv = document.createElement('div');
+        confirmDiv.className = 'confirm-submit-div';
+        confirmDiv.style.textAlign = 'center';
+        confirmDiv.style.margin = '24px 0';
+        confirmDiv.style.display = 'block';
+        var btn = document.createElement('button');
+        btn.id = 'confirmSubmitBtn';
+        btn.className = 'action-btn';
+        btn.style.fontSize = '1.1em';
+        btn.style.padding = '8px 32px';
+        btn.textContent = 'Confirm and Submit!';
+        confirmDiv.appendChild(btn);
+        reviewTableDiv.appendChild(confirmDiv);
+        // Attach handler if not already
+        btn.addEventListener('click', handleConfirmSubmit);
+    }
 }
+
+// Collect reviewed data from review tables (Excels and Manual Inputs)
+function collectReviewedData() {
+    var excels = [];
+    var reviewSections = document.querySelectorAll('.review-section');
+    reviewSections.forEach(function(section) {
+        var h4 = section.querySelector('h4');
+        if (!h4) return;
+        var title = h4.textContent;
+        var table = section.querySelector('table');
+        var headers = [];
+        var rows = [];
+        if (!table) return;
+        var thead = table.querySelector('thead tr');
+        if (thead) {
+            headers = Array.from(thead.querySelectorAll('th')).map(th => th.textContent).filter(h => h !== 'Actions');
+        }
+        var tbody = table.querySelector('tbody');
+        if (tbody) {
+            Array.from(tbody.querySelectorAll('tr')).forEach(function(tr) {
+                var row = {};
+                var tds = tr.querySelectorAll('td');
+                for (var i = 0; i < headers.length; i++) {
+                    var input = tds[i].querySelector('input,select');
+                    row[headers[i]] = input ? input.value : '';
+                }
+                row._deleted = tr.classList.contains('deleted');
+                rows.push(row);
+            });
+        }
+        // Heuristic: if table has Transaction Date etc, treat as Excel
+        if (headers.includes('Transaction Date')) {
+            // Try to get currency from title or section
+            var desc = title;
+            excels.push({ description: desc, headers, rows });
+        }
+    });
+    // Manual Inputs
+    var manual_entries = [];
+    reviewSections.forEach(function(section) {
+        var h4 = section.querySelector('h4');
+        if (!h4) return;
+        var title = h4.textContent;
+        var table = section.querySelector('table');
+        var headers = [];
+        if (!table) return;
+        var thead = table.querySelector('thead tr');
+        if (thead) {
+            headers = Array.from(thead.querySelectorAll('th')).map(th => th.textContent).filter(h => h !== 'Actions');
+        }
+        if (headers.includes('Description') && headers.includes('Total Spending')) {
+            var tr = table.querySelector('tbody tr');
+            if (tr) {
+                var tds = tr.querySelectorAll('td');
+                manual_entries.push({
+                    description: tds[0].querySelector('input').value,
+                    spending: tds[1].querySelector('input').value,
+                    spending_currency: tds[2].querySelector('select').value,
+                    income: tds[3].querySelector('input').value,
+                    income_currency: tds[4].querySelector('select').value,
+                    _deleted: tr.classList.contains('deleted')
+                });
+            }
+        }
+    });
+    // Date range
+    var start = document.getElementById('startDate')?.value || '';
+    var end = document.getElementById('endDate')?.value || '';
+    return { excels, manual_entries, date_range: { start, end } };
+}
+
+// Confirm and Submit handler
+function handleConfirmSubmit(event) {
+    event.preventDefault();
+    var btn = document.getElementById('confirmSubmitBtn');
+    if (btn) btn.disabled = true;
+    var reviewedData = collectReviewedData();
+    // debug log by printing reviewedData to console
+    console.log('Reviewed Data to Submit:', reviewedData);
+
+
+    // Show modal spinner
+    dom.modal.classList.remove('hidden');
+    dom.modal.classList.add('shown');
+    dom.modalSpinner.classList.remove('hidden');
+    dom.modalSpinner.classList.add('shown');
+    // (moved: collapse review-table on success)
+    // Send reviewedData to backend (replace with your API call)
+    fetch('http://127.0.0.1:8000/api/submit-reviewed-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewedData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        dom.modalSpinner.classList.add('hidden');
+        dom.modalSpinner.classList.remove('shown');
+        dom.summaryDetails.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: green; font-size: 16px;">&#10003;</span>
+                </div>
+                <h2>Review Data Submitted!</h2>
+            </div>
+        `;
+        // Optionally hide confirm button
+        if (btn) btn.style.display = 'none';
+        // Collapse review-table section
+        var reviewTableDiv = document.querySelector('.review-table');
+        if (reviewTableDiv) {
+            reviewTableDiv.classList.add('collapsed');
+        }
+    })
+    .catch(error => {
+        dom.modalSpinner.classList.add('hidden');
+        dom.modalSpinner.classList.remove('shown');
+        dom.summaryDetails.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: red; font-size: 16px;">&#10005;</span>
+                </div>
+                <h2>Submission Error</h2>
+            </div>
+            <p>${error.message || 'Please try again later.'}</p>
+        `;
+        if (btn) btn.disabled = false;
+    });
+}
+
+// Attach handler to confirm button and review-table expand
+window.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('confirmSubmitBtn');
+    if (btn) btn.addEventListener('click', handleConfirmSubmit);
+
+    // Add expand/collapse listener to review-table
+    var reviewTableDiv = document.querySelector('.review-table');
+    if (reviewTableDiv) {
+        reviewTableDiv.addEventListener('click', function(event) {
+            // Only expand if collapsed and click is on the header (h2)
+            if (reviewTableDiv.classList.contains('collapsed')) {
+                if (event.target.tagName === 'H2') {
+                    reviewTableDiv.classList.remove('collapsed');
+                }
+            }
+        });
+    }
+});
+
+dom.reviewTable.addEventListener('click', function(event) {
+    // Only expand if collapsed and click is on the header (h2)
+    if (dom.reviewTable.classList.contains('collapsed')) {
+        dom.reviewTable.classList.remove('collapsed');
+        dom.reviewTable.classList.add('expanded');
+    } else if (dom.reviewTable.classList.contains('expanded')) {
+        dom.reviewTable.classList.remove('expanded');
+        dom.reviewTable.classList.add('collapsed');
+    }
+});
 
 // 创建可编辑表格
 function createReviewTable(header, tableData, type, sectionIdx) {
