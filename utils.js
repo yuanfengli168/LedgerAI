@@ -236,7 +236,6 @@ function collectReviewedData() {
 function handleConfirmSubmit(event) {
     event.preventDefault();
     var btn = document.getElementById('confirmSubmitBtn');
-    if (btn) btn.disabled = true;
     var reviewedData = collectReviewedData();
     // debug log by printing reviewedData to console
     console.log('Reviewed Data to Submit:', reviewedData);
@@ -247,47 +246,48 @@ function handleConfirmSubmit(event) {
     dom.modal.classList.add('shown');
     dom.modalSpinner.classList.remove('hidden');
     dom.modalSpinner.classList.add('shown');
-    // (moved: collapse review-table on success)
-    // Send reviewedData to backend (replace with your API call)
-    fetch('http://127.0.0.1:8000/api/submit-reviewed-data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewedData)
-    })
-    .then(res => res.json())
-    .then(data => {
-        dom.modalSpinner.classList.add('hidden');
-        dom.modalSpinner.classList.remove('shown');
-        dom.summaryDetails.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: green; font-size: 16px;">&#10003;</span>
+    // Use global API function to submit reviewed data
+    submitReviewedData(reviewedData)
+        .then(data => {
+            dom.modalSpinner.classList.add('hidden');
+            dom.modalSpinner.classList.remove('shown');
+            dom.summaryDetails.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: green; font-size: 16px;">&#10003;</span>
+                    </div>
+                    <h2>Review Data Submitted!</h2>
                 </div>
-                <h2>Review Data Submitted!</h2>
-            </div>
-        `;
-        // Optionally hide confirm button
-        if (btn) btn.style.display = 'none';
-        // Collapse review-table section
-        var reviewTableDiv = document.querySelector('.review-table');
-        if (reviewTableDiv) {
-            reviewTableDiv.classList.add('collapsed');
-        }
-    })
-    .catch(error => {
-        dom.modalSpinner.classList.add('hidden');
-        dom.modalSpinner.classList.remove('shown');
-        dom.summaryDetails.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: red; font-size: 16px;">&#10005;</span>
+            `;
+            // Collapse review-table section
+            var reviewTableDiv = document.querySelector('.review-table');
+            if (reviewTableDiv) {
+                reviewTableDiv.classList.add('collapsed');
+            }
+
+            // we would like to render the data's content in the class="AI-chat-section hidden" section
+            var aiChatSection = dom.aiChatSection
+            if (aiChatSection) {
+                aiChatSection.classList.remove('hidden');
+                aiChatSection.innerHTML = `
+                    <h2>AI Chat Summary</h2>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            }
+        })
+        .catch(error => {
+            dom.modalSpinner.classList.add('hidden');
+            dom.modalSpinner.classList.remove('shown');
+            dom.summaryDetails.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: red; font-size: 16px;">&#10005;</span>
+                    </div>
+                    <h2>Submission Error</h2>
                 </div>
-                <h2>Submission Error</h2>
-            </div>
-            <p>${error.message || 'Please try again later.'}</p>
-        `;
-        if (btn) btn.disabled = false;
-    });
+                <p>${error.message || 'Please try again later.'}</p>
+            `;
+        });
 }
 
 // Attach handler to confirm button and review-table expand
