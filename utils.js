@@ -2,6 +2,7 @@
 function renderReviewTable(result) {
     var reviewTableDiv = document.querySelector('.review-table');
     if (!reviewTableDiv) return;
+    reviewTableDiv.classList.remove('hidden');
     reviewTableDiv.innerHTML = '';
 
     // 顶部 h2
@@ -36,19 +37,25 @@ function renderReviewTable(result) {
         manualH3.textContent = 'Manual Inputs';
         reviewTableDiv.appendChild(manualH3);
         result.manual_entries.forEach(function(entry, idx) {
-            // 解析 entry 字符串
+            // 解析 entry 字符串，提取币种
             var match = entry.match(/^Manual Entry (\d+):[\r\n]+Description: (.*)[\r\n]+Total Spending: ([^\s]*) ?(\w+)?[\r\n]+Total Income: ([^\s]*) ?(\w+)?/);
             var entryNum = idx + 1;
-            var desc = '', spending = '', income = '';
+            var desc = '', spending = '', spendingCurrency = 'sgd', income = '', incomeCurrency = 'sgd';
             if (match) {
                 desc = match[2] || '';
                 spending = match[3] || '0';
+                spendingCurrency = match[4] || 'sgd';
                 income = match[5] || '0';
+                incomeCurrency = match[6] || 'sgd';
             } else {
                 var lines = entry.split(/\r?\n/);
                 desc = (lines[1] || '').replace('Description:','').trim();
-                spending = (lines[2] || '').replace('Total Spending:','').trim().split(' ')[0] || '0';
-                income = (lines[3] || '').replace('Total Income:','').trim().split(' ')[0] || '0';
+                var spendingParts = (lines[2] || '').replace('Total Spending:','').trim().split(' ');
+                spending = spendingParts[0] || '0';
+                spendingCurrency = spendingParts[1] || 'sgd';
+                var incomeParts = (lines[3] || '').replace('Total Income:','').trim().split(' ');
+                income = incomeParts[0] || '0';
+                incomeCurrency = incomeParts[1] || 'sgd';
             }
             var section = document.createElement('div');
             section.className = 'review-section';
@@ -57,19 +64,52 @@ function renderReviewTable(result) {
             var table = document.createElement('table');
             var thead = document.createElement('thead');
             var trh = document.createElement('tr');
-            ['Description','Total Spending','Total Income','Actions'].forEach(function(h){
+            ['Description','Total Spending','Spending Currency','Total Income','Income Currency','Actions'].forEach(function(h){
                 var th = document.createElement('th'); th.textContent = h; trh.appendChild(th);
             });
             thead.appendChild(trh); table.appendChild(thead);
             var tbody = document.createElement('tbody');
             var tr = document.createElement('tr');
-            [desc, spending, income].forEach(function(val){
-                var td = document.createElement('td');
-                var input = document.createElement('input');
-                input.value = val;
-                td.appendChild(input);
-                tr.appendChild(td);
+            // Description
+            var tdDesc = document.createElement('td');
+            var inputDesc = document.createElement('input');
+            inputDesc.value = desc;
+            tdDesc.appendChild(inputDesc);
+            tr.appendChild(tdDesc);
+            // Spending
+            var tdSpend = document.createElement('td');
+            var inputSpend = document.createElement('input');
+            inputSpend.value = spending;
+            tdSpend.appendChild(inputSpend);
+            tr.appendChild(tdSpend);
+            // Spending Currency
+            var tdSpendCur = document.createElement('td');
+            var selectSpendCur = document.createElement('select');
+            ['sgd','usd','rmb'].forEach(function(opt){
+                var option = document.createElement('option');
+                option.value = opt; option.textContent = opt.toUpperCase();
+                if (spendingCurrency === opt) option.selected = true;
+                selectSpendCur.appendChild(option);
             });
+            tdSpendCur.appendChild(selectSpendCur);
+            tr.appendChild(tdSpendCur);
+            // Income
+            var tdIncome = document.createElement('td');
+            var inputIncome = document.createElement('input');
+            inputIncome.value = income;
+            tdIncome.appendChild(inputIncome);
+            tr.appendChild(tdIncome);
+            // Income Currency
+            var tdIncomeCur = document.createElement('td');
+            var selectIncomeCur = document.createElement('select');
+            ['sgd','usd','rmb'].forEach(function(opt){
+                var option = document.createElement('option');
+                option.value = opt; option.textContent = opt.toUpperCase();
+                if (incomeCurrency === opt) option.selected = true;
+                selectIncomeCur.appendChild(option);
+            });
+            tdIncomeCur.appendChild(selectIncomeCur);
+            tr.appendChild(tdIncomeCur);
             // Actions 按钮
             var tdAction = document.createElement('td');
             var btn = document.createElement('button');
@@ -82,12 +122,12 @@ function renderReviewTable(result) {
                     tr.classList.add('deleted');
                     btn.className = 'action-btn restore-btn';
                     btn.textContent = '恢复';
-                    Array.from(tr.querySelectorAll('input')).forEach(i => i.disabled = true);
+                    Array.from(tr.querySelectorAll('input,select')).forEach(i => i.disabled = true);
                 } else {
                     tr.classList.remove('deleted');
                     btn.className = 'action-btn delete-btn';
                     btn.textContent = '删除';
-                    Array.from(tr.querySelectorAll('input')).forEach(i => i.disabled = false);
+                    Array.from(tr.querySelectorAll('input,select')).forEach(i => i.disabled = false);
                 }
             });
             tdAction.appendChild(btn);
