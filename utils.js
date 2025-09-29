@@ -272,6 +272,7 @@ function handleConfirmSubmit(event) {
                 aiChatSection.innerHTML = `
                     <h2>AI Chat Summary</h2>
                     <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <pre>${data.ai_answer || 'No answer from AI.'}</pre>
                 `;
             }
         })
