@@ -268,12 +268,9 @@ function handleConfirmSubmit(event) {
             // we would like to render the data's content in the class="AI-chat-section hidden" section
             var aiChatSection = dom.aiChatSection
             if (aiChatSection) {
-                aiChatSection.classList.remove('hidden');
-                aiChatSection.innerHTML = `
-                    <h2>AI Chat Summary</h2>
-                    <pre>${JSON.stringify(data, null, 2)}</pre>
-                    <pre>${data.ai_answer || 'No answer from AI.'}</pre>
-                `;
+                renderAIChat();
+                aiChatMessages.push({ role: 'ai', content: data.ai_answer.gpt_answer || 'No answer from AI.' });
+                renderAIChatMessages();
             }
         })
         .catch(error => {
