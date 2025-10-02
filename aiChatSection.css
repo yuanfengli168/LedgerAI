@@ -3,7 +3,7 @@
 .ai-chatbox-container {
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: 1000px;
   max-height: 60vh;
   min-height: 300px;
   background: #f7f8fa;

@@ -51,10 +51,8 @@ function setupAIChatInput() {
         const aiMsgIndex = aiChatMessages.length;
         aiChatMessages.push({ role: 'ai', content: '<span class="ai-chatbox-blinker">|</span>' });
         renderAIChatMessages();
-        // Call backend for AI response
-        const aiText = await fetchAIChatResponse(userText);
-        // Animate streaming effect
-        await streamAIMessage(aiText, aiMsgIndex);
+        // Call backend for AI streaming response
+        await fetchAIChatResponseStream(userText, aiMsgIndex);
     };
 }
 
@@ -71,34 +69,51 @@ function escapeHTML(str) {
     });
 }
 
-async function fetchAIChatResponse(userText) {
-    // You may need to adjust the API endpoint and payload as per your backend
+
+// Streaming fetch for AI chat
+async function fetchAIChatResponseStream(userText, msgIndex) {
     try {
         const res = await fetch('http://127.0.0.1:8000/api/submit-reviewed-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_message: userText })
         });
-        const data = await res.json();
-        console.log('AI response data: ', data);
-        return data.ai_answer.gpt_answer || 'No answer from AI.';
-    } catch (e) {
-        return 'Error: Unable to get AI response.';
-    }
-}
+        if (!res.body) throw new Error('No response body');
+        const reader = res.body.getReader();
+        let decoder = new TextDecoder();
+        // let buffer = '';
+        let html = '';
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            html += escapeHTML(chunk);
 
-async function streamAIMessage(text, msgIndex) {
-    const messagesDiv = document.getElementById('aiChatMessages');
-    let i = 0;
-    let html = '';
-    while (i < text.length) {
-        html += escapeHTML(text[i]);
-        aiChatMessages[msgIndex] = { role: 'ai', content: html + '<span class="ai-chatbox-blinker">|</span>' };
+            // buffer += decoder.decode(value, { stream: true });
+            // let lines = buffer.split('\n');
+            // // Keep last partial line in buffer
+            // buffer = lines.pop();
+            // for (const line of lines) {
+            //     const trimmed = line.trim();
+            //     if (!trimmed) continue;
+            //     try {
+            //         const json = JSON.parse(trimmed);
+            //         const content = json.choices?.[0]?.delta?.content;
+            //         if (content) {
+            //             html += escapeHTML(content);
+                        aiChatMessages[msgIndex] = { role: 'ai', content: html + '<span class="ai-chatbox-blinker">|</span>' };
+                        renderAIChatMessages();
+            //         }
+            //     } catch (err) {
+            //         // Ignore JSON parse errors for incomplete lines
+            //     }
+        //     }
+        }
+        // Render final message
+        aiChatMessages[msgIndex] = { role: 'ai', content: html };
         renderAIChatMessages();
-        await new Promise(r => setTimeout(r, 18 + Math.random() * 30));
-        i++;
+    } catch (e) {
+        aiChatMessages[msgIndex] = { role: 'ai', content: 'Error: Unable to get AI response.' };
+        renderAIChatMessages();
     }
-    // Remove blinker at end
-    aiChatMessages[msgIndex] = { role: 'ai', content: html };
-    renderAIChatMessages();
 }

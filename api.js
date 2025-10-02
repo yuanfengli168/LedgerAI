@@ -12,7 +12,8 @@ async function submitReviewedData(reviewedData) {
     if (!response.ok) {
         throw new Error('Failed to submit reviewed data');
     }
-    return await response.json();
+    // Return the Response object so the caller can handle streaming or JSON as needed
+    return response;
 }
 // api.js - 前端与后端交互的基础封装
 

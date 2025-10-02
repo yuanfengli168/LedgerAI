@@ -248,7 +248,7 @@ function handleConfirmSubmit(event) {
     dom.modalSpinner.classList.add('shown');
     // Use global API function to submit reviewed data
     submitReviewedData(reviewedData)
-        .then(data => {
+        .then(response => {
             dom.modalSpinner.classList.add('hidden');
             dom.modalSpinner.classList.remove('shown');
             dom.summaryDetails.innerHTML = `
@@ -265,12 +265,23 @@ function handleConfirmSubmit(event) {
                 reviewTableDiv.classList.add('collapsed');
             }
 
-            // we would like to render the data's content in the class="AI-chat-section hidden" section
-            var aiChatSection = dom.aiChatSection
+            // Show the AI chatbox and trigger streaming (handled in aiChatSection.js)
+            var aiChatSection = dom.aiChatSection;
             if (aiChatSection) {
                 renderAIChat();
-                aiChatMessages.push({ role: 'ai', content: data.ai_answer.gpt_answer || 'No answer from AI.' });
-                renderAIChatMessages();
+                // Automatically trigger streaming with default prompt
+                const defaultPrompt = "Show me the summary for my reviewed data, and tell me my total costs, and total income in Singapore Dollar";
+                // Add user message to chat
+                if (typeof aiChatMessages !== 'undefined') {
+                    aiChatMessages.push({ role: 'user', content: defaultPrompt });
+                }
+                if (typeof fetchAIChatResponseStream === 'function') {
+                    // Add placeholder for AI message
+                    const aiMsgIndex = aiChatMessages.length;
+                    aiChatMessages.push({ role: 'ai', content: '<span class="ai-chatbox-blinker">|</span>' });
+                    renderAIChatMessages();
+                    fetchAIChatResponseStream(defaultPrompt, aiMsgIndex);
+                }
             }
         })
         .catch(error => {
