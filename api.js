@@ -1,20 +1,21 @@
-/**
- * Submit reviewed data to backend
- * @param {Object} reviewedData - The reviewed data JSON object
- * @returns {Promise<Object>} Backend response JSON
- */
-async function submitReviewedData(reviewedData) {
-    const response = await fetch('http://127.0.0.1:8000/api/submit-reviewed-data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewedData)
-    });
-    if (!response.ok) {
-        throw new Error('Failed to submit reviewed data');
-    }
-    // Return the Response object so the caller can handle streaming or JSON as needed
-    return response;
-}
+// comment out this function because we no longer need it, we use streaming instead
+// /**
+//  * Submit reviewed data to backend
+//  * @param {Object} reviewedData - The reviewed data JSON object
+//  * @returns {Promise<Object>} Backend response JSON
+//  */
+// async function submitReviewedData(reviewedData) {
+//     const response = await fetch('http://127.0.0.1:8000/api/submit-reviewed-data', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(reviewedData)
+//     });
+//     if (!response.ok) {
+//         throw new Error('Failed to submit reviewed data');
+//     }
+//     // Return the Response object so the caller can handle streaming or JSON as needed
+//     return response;
+// }
 // api.js - 前端与后端交互的基础封装
 
 /** 上传 FormData 到后端分析接口

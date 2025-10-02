@@ -241,63 +241,78 @@ function handleConfirmSubmit(event) {
     console.log('Reviewed Data to Submit:', reviewedData);
 
 
-    // Show modal spinner
-    dom.modal.classList.remove('hidden');
-    dom.modal.classList.add('shown');
-    dom.modalSpinner.classList.remove('hidden');
-    dom.modalSpinner.classList.add('shown');
-    // Use global API function to submit reviewed data
-    submitReviewedData(reviewedData)
-        .then(response => {
-            // if success, please do not show the modal because it will block the AI chatbox, and the streamline
-            dom.modalSpinner.classList.add('hidden');
-            dom.modalSpinner.classList.remove('shown');
-            dom.summaryDetails.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <span style="color: green; font-size: 16px;">&#10003;</span>
-                    </div>
-                    <h2>Review Data Submitted!</h2>
-                </div>
-            `;
-            // Collapse review-table section
-            var reviewTableDiv = document.querySelector('.review-table');
-            if (reviewTableDiv) {
-                reviewTableDiv.classList.add('collapsed');
-            }
+    // // Show modal spinner
+    // dom.modal.classList.remove('hidden');
+    // dom.modal.classList.add('shown');
+    // dom.modalSpinner.classList.remove('hidden');
+    // dom.modalSpinner.classList.add('shown');
+    // // Use global API function to submit reviewed data
 
-            // Show the AI chatbox and trigger streaming (handled in aiChatSection.js)
-            var aiChatSection = dom.aiChatSection;
-            if (aiChatSection) {
-                renderAIChat();
-                // Automatically trigger streaming with default prompt
-                const defaultPrompt = "Show me the summary for my reviewed data, and tell me my total costs, and total income in Singapore Dollar";
-                // Add user message to chat
-                if (typeof aiChatMessages !== 'undefined') {
-                    aiChatMessages.push({ role: 'user', content: defaultPrompt });
-                }
-                if (typeof fetchAIChatResponseStream === 'function') {
-                    // Add placeholder for AI message
-                    const aiMsgIndex = aiChatMessages.length;
-                    aiChatMessages.push({ role: 'ai', content: '<span class="ai-chatbox-blinker">|</span>' });
-                    renderAIChatMessages();
-                    fetchAIChatResponseStream(defaultPrompt, aiMsgIndex);
-                }
-            }
-        })
-        .catch(error => {
-            dom.modalSpinner.classList.add('hidden');
-            dom.modalSpinner.classList.remove('shown');
-            dom.summaryDetails.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <span style="color: red; font-size: 16px;">&#10005;</span>
-                    </div>
-                    <h2>Submission Error</h2>
-                </div>
-                <p>${error.message || 'Please try again later.'}</p>
-            `;
-        });
+    // // submitReviewedData(reviewedData)
+    // //     .then(response => {
+    // // if success, please do not show the modal because it will block the AI chatbox, and the streamline
+    // dom.modalSpinner.classList.add('hidden');
+    // dom.modalSpinner.classList.remove('shown');
+    // dom.summaryDetails.innerHTML = `
+    //     <div style="display: flex; align-items: center; gap: 10px;">
+    //         <div style="width: 24px; height: 24px; border: 2px solid green; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+    //             <span style="color: green; font-size: 16px;">&#10003;</span>
+    //         </div>
+    //         <h2>Review Data Submitted!</h2>
+    //     </div>
+    // `;
+    // Collapse review-table section
+    var reviewTableDiv = document.querySelector('.review-table');
+    if (reviewTableDiv) {
+        reviewTableDiv.classList.remove('expanded');
+        reviewTableDiv.classList.add('collapsed');
+    }
+
+    // Show the AI chatbox and trigger streaming (handled in aiChatSection.js)
+    var aiChatSection = dom.aiChatSection;
+    if (aiChatSection) {
+        renderAIChat();
+    // // Automatically trigger streaming with default prompt
+    // const defaultPrompt = "Show me the summary for my reviewed data, and tell me my total costs, and total income in Singapore Dollar";
+    // // Add user message to chat
+    // if (typeof aiChatMessages !== 'undefined') {
+    //     aiChatMessages.push({ role: 'user', content: defaultPrompt });
+    // }
+
+    aiChatMessages.push({ role: 'user', content: 'Reviewed data submitted. Please assist in summarizing the total costs and income in SGD.' });
+
+    // const defaultPrompt =
+    //     "You are a financial assistant. I will give you my financial data in JSON format, including Excel files and manual entries, with different currencies. " +
+    //     "Your task: Calculate and summarize the total cost and total income in SGD (but list the calculation in original currency and transferring in parenthesis). " +
+    //     "Important: In the JSON, each row may have a field '_deleted'. If '_deleted' is true, you must ignore that row in all calculations. " +
+    //     "Use the provided currency fields and assume 1 USD = 1.35 SGD, 1 RMB = 0.19 SGD unless otherwise specified. " +
+    //     "If you need to make any assumptions, state them clearly. " +
+    //     "Here is the data:\n" +
+    //     JSON.stringify(reviewedData) + "\n" +
+    //     "Please output only the summary and totals in SGD, and a brief explanation of your calculation steps.";
+
+        if (typeof fetchAIChatResponseStream === 'function') {
+            // Add placeholder for AI message
+            const aiMsgIndex = aiChatMessages.length;
+            aiChatMessages.push({ role: 'ai', content: '<span class="ai-chatbox-blinker">|</span>' });
+            renderAIChatMessages();
+            fetchAIChatResponseStream(reviewedData, aiMsgIndex);
+        }
+    }
+        // })
+        // .catch(error => {
+        //     dom.modalSpinner.classList.add('hidden');
+        //     dom.modalSpinner.classList.remove('shown');
+        //     dom.summaryDetails.innerHTML = `
+        //         <div style="display: flex; align-items: center; gap: 10px;">
+        //             <div style="width: 24px; height: 24px; border: 2px solid red; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+        //                 <span style="color: red; font-size: 16px;">&#10005;</span>
+        //             </div>
+        //             <h2>Submission Error</h2>
+        //         </div>
+        //         <p>${error.message || 'Please try again later.'}</p>
+        //     `;
+        // });
 }
 
 // Attach handler to confirm button and review-table expand
