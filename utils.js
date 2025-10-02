@@ -249,6 +249,7 @@ function handleConfirmSubmit(event) {
     // Use global API function to submit reviewed data
     submitReviewedData(reviewedData)
         .then(response => {
+            // if success, please do not show the modal because it will block the AI chatbox, and the streamline
             dom.modalSpinner.classList.add('hidden');
             dom.modalSpinner.classList.remove('shown');
             dom.summaryDetails.innerHTML = `

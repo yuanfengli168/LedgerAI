@@ -27,9 +27,10 @@ function renderAIChatMessages() {
     aiChatMessages.forEach(msg => {
         const div = document.createElement('div');
         div.className = `ai-message ${msg.role}`;
-        console.log('Rendering message: ', msg);
+        // Support rendering HTML content safely
         div.innerHTML = msg.content;
         messagesDiv.appendChild(div);
+        
     });
     // Auto-scroll to bottom
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -88,26 +89,8 @@ async function fetchAIChatResponseStream(userText, msgIndex) {
             if (done) break;
             const chunk = decoder.decode(value, { stream: true });
             html += escapeHTML(chunk);
-
-            // buffer += decoder.decode(value, { stream: true });
-            // let lines = buffer.split('\n');
-            // // Keep last partial line in buffer
-            // buffer = lines.pop();
-            // for (const line of lines) {
-            //     const trimmed = line.trim();
-            //     if (!trimmed) continue;
-            //     try {
-            //         const json = JSON.parse(trimmed);
-            //         const content = json.choices?.[0]?.delta?.content;
-            //         if (content) {
-            //             html += escapeHTML(content);
-                        aiChatMessages[msgIndex] = { role: 'ai', content: html + '<span class="ai-chatbox-blinker">|</span>' };
-                        renderAIChatMessages();
-            //         }
-            //     } catch (err) {
-            //         // Ignore JSON parse errors for incomplete lines
-            //     }
-        //     }
+            aiChatMessages[msgIndex] = { role: 'ai', content: html + '<span class="ai-chatbox-blinker">|</span>' };
+            renderAIChatMessages();
         }
         // Render final message
         aiChatMessages[msgIndex] = { role: 'ai', content: html };
