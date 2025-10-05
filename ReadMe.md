@@ -1,4 +1,4 @@
-# LeadgerAI
+# LeadgerAI: https://yuanfengli168.github.io/LedgerAI/
 - An open source tool that helps you saving at least 30 mins on your financial ledger per month. 
 - author: Yuafeng Li
 - first Date: Aug 31 2025

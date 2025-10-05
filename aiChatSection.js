@@ -24,6 +24,8 @@ function renderAIChatMessages() {
     const messagesDiv = document.getElementById('aiChatMessages');
     if (!messagesDiv) return;
     messagesDiv.innerHTML = '';
+    console.log('Rendering messages:', aiChatMessages);
+
     aiChatMessages.forEach(msg => {
         const div = document.createElement('div');
         div.className = `ai-message ${msg.role}`;
@@ -42,7 +44,7 @@ function setupAIChatInput() {
     if (!form || !input) return;
     form.onsubmit = async (e) => {
         e.preventDefault();
-        const userText = input.value.trim();
+        let userText = input.value.trim();
         if (!userText) return;
         // Add user message
         aiChatMessages.push({ role: 'user', content: escapeHTML(userText) });
@@ -53,6 +55,15 @@ function setupAIChatInput() {
         aiChatMessages.push({ role: 'ai', content: '<span class="ai-chatbox-blinker">|</span>' });
         renderAIChatMessages();
         // Call backend for AI streaming response
+        // please add the ai response from just the single one previous message into userText
+        // so that the backend can have context of previous message
+        getOnePreviousAlreadyReturnedAIResponse = aiChatMessages.filter(msg => msg.role === 'ai').slice(-2)[0]?.content;
+        console.log('Previous AI response:', getOnePreviousAlreadyReturnedAIResponse);
+        if (getOnePreviousAlreadyReturnedAIResponse) {
+            userText += "\nPrevious AI response:\n" + getOnePreviousAlreadyReturnedAIResponse.replace(/<[^>]+>/g, '');
+        }
+        console.log('Sending to backend:', userText);
+
         await fetchAIChatResponseStream(userText, aiMsgIndex);
     };
 }
@@ -74,7 +85,7 @@ function escapeHTML(str) {
 // Streaming fetch for AI chat
 async function fetchAIChatResponseStream(userText, msgIndex) {
     try {
-        const res = await fetch('http://127.0.0.1:8000/api/submit-reviewed-data', {
+        const res = await fetch('http://127.0.0.1:8000/api/deepseek-api-real', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_message: userText })
